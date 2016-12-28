@@ -3,9 +3,11 @@
 <style>
 	#header{
 		position: absolute;
-		top: 10px;
-		left: 10px; 
-		color: #3d3d3d;
+		top: 0px;
+		left: 0px;
+		width: 100%;
+		background-color: #232524;
+		color: white;
 		font-family: "Trebuchet MS", Verdana, sans-serif;
 		font-size: 25;
 		display: inline-block;
@@ -25,12 +27,13 @@
 	#links{
 		display: inline;
 		whitespace: nowrap;
+	
 	}
 	
 	#calendar{
 		position: absolute;
-		top: 100px;
-		left: 400px;
+		top: 110px;
+		left: 20px;
 		font-family: "Trebuchet MS", Verdana, sans-serif;
 		font-size: 25;
 	}
@@ -49,32 +52,62 @@
 		bottom: 10px;
 		left: 10px;
 	}
+	
+	table#top{
+		border: none;
+		position: abosolute;
+		top: 0px;
+		left: 260px;
+		vertical-align: bottom;
+		font: inherit;
+		color: inherit;
+
+	}
+	
+	table#top td{
+		height: 70px;
+		vertical-align: bottom;
+		padding-right: 25px;
+	}
+	
+	#panel{
+		position: absolute;
+		top: 110px;
+		left: 500px;
+		background-color: d9373c;
+		width: 300px;
+		height: 327px;
+	}
+	
+	
+	
 
 </style>
 
 </head>
+
+<?php
+// CONNECT TO DATABASE
+require 'vendor/autoload.php';
+use App\SQLiteConnection;
+
+$pdo = (new SQLiteConnection())->connect();
+?>
+
 <body>
-<table align="center" cellpadding="0" cellspacing="0" width="1000px">
-<tbody>
-<tr>
+
 <div id = "header">
-<div id = "image">
-<img src="http://i.imgur.com/rCYjjsD.jpg">
-</div>
+<img src="http://i.imgur.com/rCYjjsD.jpg" style="float:left">
 
 <div id="links">
-<div id="title">
-<b>Admin Controls</b>
+
+<table id="top"><tr>
+<td><a href = "schedule.php"> Schedule a Shift </a></td>
+<td><a href = "generate.php"> Generate Report </a></td>
+<td><a href = "viewemp.php"> Employees </a></td></tr></table>
 </div>
-<a href = "schedule.php"> Schedule a Shift </a>
-<a href = "generate.php"> Generate Report </a>
-<a href = "viewemp.php"> Employees </a>
 </div>
-</div>
-</tr>
-<tr></tr>
-</tbody>
-</table>
+
 
 <div id = "calendar">
 <script language="javascript" type="text/javascript">
@@ -184,5 +217,26 @@ document.write(cal);
 
 //  End -->
 </script>
+</div>
+
+<div id="panel">
+<?php
+	// output list of employees in table format
+	echo '<h3>Employee List</h3>';
+	echo '<table><tbody>';
+	
+	// fetch list of employees
+	$sql = "SELECT id, firstname, lastname FROM Employee;";
+	$stmt = $pdo->query($sql);
+	while ($employee = $stmt->fetchObject()) {
+		$firstname = $employee->firstname;
+		$lastname = $employee->lastname;
+		$id = $employee->id;
+		echo "<tr><td><a href=\"employee.php?id=$id\">View/Edit</a></td><td>$firstname $lastname</td></tr>";
+	}
+	echo "<tr><td><a href=\"google.com\">+ Add an Employee</a></td></tr></tbody></table>";
+	
+
+?>
 </div>
 </body>
