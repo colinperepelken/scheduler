@@ -14,7 +14,10 @@ $pdo = (new SQLiteConnection())->connect();
 <?php
 
 if(isset($_GET['id'])) {
+	/* VIEWING AND EDITING A CURRENT EMPLOYEE */
+
 	$id = $_GET['id'];
+	echo "<h2>Editing Employee ID: $id</h2>";
 	// query db using id
 	// prepare select statement
 	$sql = "SELECT firstname, lastname, email, phone, username FROM Employee WHERE id = :id;";
@@ -27,21 +30,46 @@ if(isset($_GET['id'])) {
 	$username = $employee->username;
 	$phone = $employee->phone;
 	
+	$cmd = "update";
 
-	echo "<form method=\"get\" action=\"admin.php\">
-			<table>
-			<tr><td align =\"left\">First Name:</td><td align =\"left\"><input type=\"text\" name=\"firstname\" size=\"30\" value=\"$firstname\"></td></td>
-			<tr><td  align =\"left\">Last Name:</td><td  align =\"left\"><input type=\"text\" name=\"lastname\" size=\"30\" value=\"$lastname\"></td></td>
-			<tr><td align =\"left\">Email:</td><td align =\"left\"><input type=\"text\" name=\"email\" size=\"30\" value=\"$email\"></td></td>
-			<tr><td align =\"left\">Site Username:</td><td align =\"left\"><input type=\"text\" name=\"wid\" size=\"30\" value=\"$username\"></td></td>
-			<tr><td align =\"left\">Phone:</td><td align =\"left\"><input type=\"text\" name=\"phone\" size=\"10\" value=\"$phone\"></td></td>
-			</table>
-			<br><br>
-			<input type=\"submit\" name=\"submit\" value=\"Save\" id=\"submit\" />
-			</form>";
+} else if (isset($_GET['cmd'])) {
+	/* SAVE BUTTON HAS BEEN PRESSED */
+	$cmd = $_GET['cmd'];
+	if(!empty($_GET['firstname']) && !empty($_GET['lastname'])) {
+		if ($cmd == "update") {
+			echo "updating existing emp";
+		} else if ($cmd == "add") {
+			echo "adding new emp";
+		}
+	} else { // invalid! database requires first name and last name
+		$message = "Invalid! Firstname and Lastname must not be empty.";
+		echo "<script type='text/javascript'>alert('$message');</script>";
+		
+	}
+	
+	
+	
 } else {
-	echo "Error. No employee selected. Please go back.";
+	/* ADDING A NEW EMPLOYEE */
+	echo "<h2>Add an Employee</h2>";
+	$firstname = $lastname = $email = $username = $phone = "";
+	$id = -1;
+	
+	$cmd = "add";
 }
+
+echo "<form method=\"get\" action=\"employee.php\">
+		<table>
+		<tr><td align =\"left\">First Name:</td><td align =\"left\"><input type=\"text\" name=\"firstname\" size=\"30\" value=\"$firstname\"></td></td>
+		<tr><td  align =\"left\">Last Name:</td><td  align =\"left\"><input type=\"text\" name=\"lastname\" size=\"30\" value=\"$lastname\"></td></td>
+		<tr><td align =\"left\">Email:</td><td align =\"left\"><input type=\"text\" name=\"email\" size=\"30\" value=\"$email\"></td></td>
+		<tr><td align =\"left\">Site Username:</td><td align =\"left\"><input type=\"text\" name=\"wid\" size=\"30\" value=\"$username\"></td></td>
+		<tr><td align =\"left\">Phone:</td><td align =\"left\"><input type=\"text\" name=\"phone\" size=\"10\" value=\"$phone\"></td></td>
+		</table>
+		<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">
+		<br><br>
+		<input type=\"submit\" name=\"submit\" value=\"Save\" id=\"submit\" />
+		</form>";
 ?>
 
 <body>

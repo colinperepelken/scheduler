@@ -234,7 +234,7 @@ document.write(cal);
 		$id = $employee->id;
 		echo "<tr><td><a href=\"employee.php?id=$id\">View/Edit</a></td><td>$firstname $lastname</td></tr>";
 	}
-	echo "<tr><td><a href=\"google.com\">+ Add an Employee</a></td></tr></tbody></table>";
+	echo "<tr><td><a href=\"employee.php\">+ Add an Employee</a></td></tr></tbody></table>";
 	
 
 ?>
