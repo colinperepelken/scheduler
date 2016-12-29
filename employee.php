@@ -17,7 +17,7 @@ $pdo = (new SQLiteConnection())->connect();
 <div id="links">
 
 <table id="top"><tr>
-<td><a href = "admin.php"> Back To Home </a></td></tr></table>
+<td><a href = "admin.php?showemp=1"> Back To Home </a></td></tr></table>
 </div>
 </div>
 <div id="calendar">

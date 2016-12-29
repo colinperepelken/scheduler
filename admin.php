@@ -19,9 +19,9 @@ $pdo = (new SQLiteConnection())->connect();
 <div id="links">
 
 <table id="top"><tr>
-<td><a href = "schedule.php"> Schedule a Shift </a></td>
+<td><a href = "admin.php?year=<?php echo date("Y"); ?>&month=<?php echo date("m"); ?>&day=<?php echo date("d"); ?>"> Schedule a Shift </a></td>
 <td><a href = "generate.php"> Generate Report </a></td>
-<td><a href = "viewemp.php"> Employees </a></td></tr></table>
+<td><a href = "admin.php?showemp=1"> Employees </a></td></tr></table>
 </div>
 </div>
 
@@ -110,11 +110,11 @@ if( Calendar.getDate() > index )
 
   // HIGHLIGHT TODAY'S DATE
   if( today==Calendar.getDate() )
-  cal += highlight_start + day + highlight_end + TD_end;
+  cal += highlight_start + '<a href=admin.php?year=' + year + '&month=' + (month+1) + '&day=' + day + '>' + day + '</a>' + highlight_end + TD_end;
 
   // PRINTS DAY
   else
-  cal += TD_start + day + TD_end;
+  cal += TD_start + '<a href=admin.php?year=' + year + '&month=' + (month+1) + '&day=' + day + '>' + day + '</a>' + TD_end;
   }
 
   // END ROW FOR LAST DAY OF WEEK
@@ -138,6 +138,8 @@ document.write(cal);
 
 <div id="panel">
 <?php
+/* EMPLOYEE LIST */
+if(isset($_GET['showemp'])) {
 	// output list of employees in table format
 	echo '<h3>Employee List</h3>';
 	echo '<table><tbody>';
@@ -149,10 +151,46 @@ document.write(cal);
 		$firstname = $employee->firstname;
 		$lastname = $employee->lastname;
 		$id = $employee->id;
-		echo "<tr><td><a href=\"employee.php?id=$id\">View/Edit</a></td><td>$firstname $lastname</td></tr>";
+		echo "<tr><td><a href=\"employee.php?id=$id\">$firstname $lastname</a></td></tr>";
 	}
 	echo "<tr><td><a href=\"employee.php\">+ Add an Employee</a></td></tr></tbody></table>";
 	
+} else if(isset($_GET['day'])) {
+	/* SCHEDULING A SHIFT */
+	// get date info
+	$year = $_GET['year'];
+	$month = $_GET['month'];
+	$day = $_GET['day'];
+	$date = "$year-$month-$day";
+	
+	echo "<h3>Shifts on $date</h3>"; // output header
+	echo "<table><tbody><tr><th>Start</th><th>End</th><th>Employee</th></tr>";
+	
+	// query shifts on this day
+	$sql = "SELECT start_date, finish_date, firstname, lastname"
+			. " FROM Employee E, Shift S"
+			. " WHERE E.id = S.eid AND start_date LIKE :date;";
+	$stmt = $pdo->prepare($sql);
+	$date = "%".$date."%";
+	$stmt->execute([':date' => $date]);
+	while ($shift = $stmt->fetchObject()) {
+		$start = date("H:i:s", strtotime($shift->start_date));
+		$finish = date("H:i:s", strtotime($shift->finish_date));
+		$firstname = $shift->firstname;
+		$lastname = $shift->lastname;
+		
+		echo "<tr><td>$start</td><td>$finish</td><td>$firstname $lastname</td></tr>";
+	}
+	
+	echo "</tbody></table>";
+}
+?>
+</div>
+<div id="panel2">
+<?php
+if(isset($_GET['day'])) {
+	echo "<h3>Schedule a Shift</h3>";
+}
 
 ?>
 </div>
