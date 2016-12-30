@@ -17,7 +17,7 @@ $pdo = (new SQLiteConnection())->connect();
  */
 function getEmployees() {
 	global $pdo;
-	$sql = "SELECT id, firstname, lastname FROM Employee;";
+	$sql = "SELECT id, firstname, lastname FROM Employee ORDER BY firstname ASC";
 	$stmt = $pdo->query($sql);
 	$employees = [];
 	while ($employee = $stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -176,6 +176,12 @@ if(isset($_GET['showemp'])) {
 	
 } else if(isset($_GET['day'])) {
 
+	// get date info
+	$year = $_GET['year'];
+	$month = $_GET['month'];
+	$day = $_GET['day'];
+	$date = "$year-$month-$day";
+
 	/* DELETE A SHIFT */
 	if(isset($_GET['del'])) {
 		$sid = $_GET['del'];
@@ -185,15 +191,35 @@ if(isset($_GET['showemp'])) {
 		$stmt->execute([':sid' => $sid]);
 	}
 	
-	
+	/* INSERT A SHIFT */
+	if(isset($_GET['submit']) && $_GET['submit'] == "Add Shift") {
+		// get
+		$employee = $_GET['employee'];
+		$start = $_GET['start'];
+		$finish = $_GET['finish'];
+			
+		// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
+		$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
+			
+		// format start_date and finish_date
+		$start_date = $date . " " . $start;
+		$finish_date = $date . " " . $finish;
+			
+		// prepare SQL insert statement
+		$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
+				. " VALUES (:eid, :start_date, :finish_date);";
+		$stmt = $pdo->prepare($sql);
+		
+		// passing values to the parameters
+		$stmt->bindValue(':eid', $eid);
+		$stmt->bindValue(':start_date', $start_date);
+		$stmt->bindValue(':finish_date', $finish_date);
+					
+		$stmt->execute(); // execute the statement
+	}
 	
 	
 	/* VIEWING SCHEDULED SHIFTS */
-	// get date info
-	$year = $_GET['year'];
-	$month = $_GET['month'];
-	$day = $_GET['day'];
-	$date = "$year-$month-$day";
 	
 	echo "<h3>Shifts on $date</h3>"; // output header
 	echo "<table id=\"shifts\"><tbody><tr><th>Start</th><th>Finish</th><th>Employee</th></tr>";
@@ -201,15 +227,16 @@ if(isset($_GET['showemp'])) {
 	// query shifts on this day
 	$sql = "SELECT start_date, finish_date, firstname, lastname, id, sid"
 			. " FROM Employee E, Shift S"
-			. " WHERE E.id = S.eid AND start_date LIKE :date;";
+			. " WHERE E.id = S.eid AND start_date LIKE :date"
+			. " ORDER BY start_date ASC;";
 	$stmt = $pdo->prepare($sql);
 	$date = "%".$date."%";
 	$stmt->execute([':date' => $date]);
 	$count = 0;
 	while ($shift = $stmt->fetchObject()) {
 		// start and finish displayed as only hours and minutes
-		$start = date("H:i:s", strtotime($shift->start_date));
-		$finish = date("H:i:s", strtotime($shift->finish_date));
+		$start = date("g:i a", strtotime($shift->start_date));
+		$finish = date("g:i a", strtotime($shift->finish_date));
 		$firstname = $shift->firstname;
 		$lastname = $shift->lastname;
 		$id = $shift->id;
@@ -252,35 +279,6 @@ if(isset($_GET['showemp'])) {
 	echo "</form></tbody></table>";
 	if($count == 0) {
 		echo "<p>No shifts scheduled.</p>"; // output message if there are no shifts
-	}
-	
-	/* INSERT A SHIFT */
-	if(isset($_GET['submit']) && $_GET['submit'] == "Add Shift") {
-		// get
-		$employee = $_GET['employee'];
-		$start = $_GET['start'];
-		$finish = $_GET['finish'];
-			
-		// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
-		$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
-			
-		// format start_date and finish_date
-		$start_date = $date . " " . $start;
-		$finish_date = $date . " " . $finish;
-			
-		// prepare SQL insert statement
-		$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
-				. " VALUES (:eid, :start_date, :finish_date);";
-		$stmt = $pdo->prepare($sql);
-		
-		// passing values to the parameters
-		$stmt->bindValue(':eid', $eid);
-		$stmt->bindValue(':start_date', $start_date);
-		$stmt->bindValue(':finish_date', $finish_date);
-					
-		$stmt->execute(); // execute the statement
-		$message = "Shift Added!";
-		echo "<script type='text/javascript'>alert('$message');</script>";
 	}
 }
 ?>
