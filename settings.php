@@ -56,6 +56,7 @@ while ($day = $stmt->fetchObject()) {
 </div>
 </div>
 <div id="calendar">
+<h3>Store Hours</h3>
 <form method="get" action="settings.php">
 <table>
 <tbody>
