@@ -36,3 +36,11 @@ CREATE TABLE Manager(
 		ON UPDATE CASCADE -- update manager id if the employee id is changed
 		ON DELETE CASCADE -- remove manager if employee is removed
 );
+
+-- store hours for each week day
+CREATE TABLE Hours (
+	weekday VARCHAR(9),
+	open_time TIME,
+	close_time TIME,
+	PRIMARY KEY(weekday)
+);
