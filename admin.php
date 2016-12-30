@@ -175,6 +175,19 @@ if(isset($_GET['showemp'])) {
 	echo "<tr><td><a href=\"employee.php\">+ Add an Employee</a></td></tr></tbody></table>";
 	
 } else if(isset($_GET['day'])) {
+
+	/* DELETE A SHIFT */
+	if(isset($_GET['del'])) {
+		$sid = $_GET['del'];
+		
+		$sql = "DELETE FROM Shift WHERE sid = :sid";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute([':sid' => $sid]);
+	}
+	
+	
+	
+	
 	/* VIEWING SCHEDULED SHIFTS */
 	// get date info
 	$year = $_GET['year'];
@@ -186,7 +199,7 @@ if(isset($_GET['showemp'])) {
 	echo "<table id=\"shifts\"><tbody><tr><th>Start</th><th>Finish</th><th>Employee</th></tr>";
 	
 	// query shifts on this day
-	$sql = "SELECT start_date, finish_date, firstname, lastname, id"
+	$sql = "SELECT start_date, finish_date, firstname, lastname, id, sid"
 			. " FROM Employee E, Shift S"
 			. " WHERE E.id = S.eid AND start_date LIKE :date;";
 	$stmt = $pdo->prepare($sql);
@@ -200,8 +213,10 @@ if(isset($_GET['showemp'])) {
 		$firstname = $shift->firstname;
 		$lastname = $shift->lastname;
 		$id = $shift->id;
+		$sid = $shift->sid;
 		
-		echo "<tr><td>$start</td><td>$finish</td><td><a href=\"employee.php?id=$id\">$firstname $lastname</a></td></tr>";
+		echo "<tr><td>$start</td><td>$finish</td><td><a href=\"employee.php?id=$id\">$firstname $lastname</a></td>
+				<td><a href=admin.php?del=$sid&day=$day&month=$month&year=$year><button type=\"button\">Delete</button></a></td></tr>";
 		$count++;
 	}
 	
@@ -241,32 +256,32 @@ if(isset($_GET['showemp'])) {
 	
 	/* INSERT A SHIFT */
 	if(isset($_GET['submit']) && $_GET['submit'] == "Add Shift") {
-	// get
-	$employee = $_GET['employee'];
-	$start = $_GET['start'];
-	$finish = $_GET['finish'];
+		// get
+		$employee = $_GET['employee'];
+		$start = $_GET['start'];
+		$finish = $_GET['finish'];
+			
+		// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
+		$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
+			
+		// format start_date and finish_date
+		$start_date = $date . " " . $start;
+		$finish_date = $date . " " . $finish;
+			
+		// prepare SQL insert statement
+		$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
+				. " VALUES (:eid, :start_date, :finish_date);";
+		$stmt = $pdo->prepare($sql);
 		
-	// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
-	$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
-		
-	// format start_date and finish_date
-	$start_date = $date . " " . $start;
-	$finish_date = $date . " " . $finish;
-		
-	// prepare SQL insert statement
-	$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
-			. " VALUES (:eid, :start_date, :finish_date);";
-	$stmt = $pdo->prepare($sql);
-	
-	// passing values to the parameters
-	$stmt->bindValue(':eid', $eid);
-	$stmt->bindValue(':start_date', $start_date);
-	$stmt->bindValue(':finish_date', $finish_date);
-				
-	$stmt->execute(); // execute the statement
-	$message = "Shift Added!";
-	echo "<script type='text/javascript'>alert('$message');</script>";
-}
+		// passing values to the parameters
+		$stmt->bindValue(':eid', $eid);
+		$stmt->bindValue(':start_date', $start_date);
+		$stmt->bindValue(':finish_date', $finish_date);
+					
+		$stmt->execute(); // execute the statement
+		$message = "Shift Added!";
+		echo "<script type='text/javascript'>alert('$message');</script>";
+	}
 }
 ?>
 </div>
