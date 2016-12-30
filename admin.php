@@ -204,23 +204,21 @@ if(isset($_GET['showemp'])) {
 		echo "<tr><td>$start</td><td>$finish</td><td><a href=\"employee.php?id=$id\">$firstname $lastname</a></td></tr>";
 		$count++;
 	}
-	echo "</tbody></table>";
-	if($count == 0) {
-		echo "<p>No shifts scheduled.</p>";
-	}
-}
-?>
-</div>
-<div id="panel2">
-<?php
-/* SCHEDULE A SHIFT */
-if(isset($_GET['day'])) {
+	
+	/* OUTPUT FORM TO ADD A SHIFT */
 	$date = str_replace("%","",$date); // remove % which were added for sql query.
-	echo "<h3>Schedule a Shift on $date</h3>"; // heading
-	// output form
-	echo "<form method=\"get\" action=\"admin.php\">
-			<table>
-			<tr><td align =\"left\">Employee:</td><td align =\"left\"><input list=\"employees\" name=\"employee\" value=\"\">
+	
+	// output time inputs
+	echo "<tr><form method=\"get\" action=\"admin.php\"><td><input type=\"time\" name=\"start\" value=\"10:00 AM\"></td>
+			<td><input type=\"time\" name=\"finish\" value=\"11:00 PM\"></td>
+			
+			<input type=\"hidden\" name=\"day\" value=\"$day\">
+			<input type=\"hidden\" name=\"year\" value=\"$year\">
+			<input type=\"hidden\" name=\"month\" value=\"$month\">";
+			
+	
+	// output employee selector
+	echo "<td><input list=\"employees\" name=\"employee\" value=\"\"> 
 			<datalist id=\"employees\">";
 	
 	// get list of employees for drop down input form
@@ -231,31 +229,25 @@ if(isset($_GET['day'])) {
 		echo "<option value=\"$firstname $lastname ($id)\">";
 	}
 	
+	// close datalist and print submit button
 	echo 	"</datalist>
-			</td></td>";
+			</td><td><input type=\"submit\" name=\"submit\" value=\"Add Shift\" id=\"submit\" /></td></form></tr>";
 		
+	// close table
+	echo "</form></tbody></table>";
+	if($count == 0) {
+		echo "<p>No shifts scheduled.</p>"; // output message if there are no shifts
+	}
 	
-	// output time inputs
-	echo "<tr><td  align =\"left\">Start:</td><td  align =\"left\"><input type=\"time\" name=\"start\" value=\"10:00 AM\"></td></td>
-			<tr><td align =\"left\">Finish:</td><td align =\"left\"><input type=\"time\" name=\"finish\" value=\"11:00 PM\"></td></td>
-			</table>
-			<input type=\"hidden\" name=\"day\" value=\"$day\">
-			<input type=\"hidden\" name=\"year\" value=\"$year\">
-			<input type=\"hidden\" name=\"month\" value=\"$month\">
-			<input type=\"submit\" name=\"submit\" value=\"Schedule\" id=\"submit\" />
-			</form>";
-	// end form
-}
-
-/* INSERT A SHIFT */
-if(isset($_GET['submit']) && $_GET['submit'] == "Schedule") {
+	/* INSERT A SHIFT */
+	if(isset($_GET['submit']) && $_GET['submit'] == "Add Shift") {
 	// get
 	$employee = $_GET['employee'];
 	$start = $_GET['start'];
 	$finish = $_GET['finish'];
 		
 	// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
-	$eid = preg_replace("/[^0-9]/","",$employee); // get numbers from string and store in eid
+	$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
 		
 	// format start_date and finish_date
 	$start_date = $date . " " . $start;
@@ -265,13 +257,6 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Schedule") {
 	$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
 			. " VALUES (:eid, :start_date, :finish_date);";
 	$stmt = $pdo->prepare($sql);
-		
-	echo $eid;
-	echo "<br>";
-	echo $start_date;
-	echo "<br>";
-	echo $finish_date;
-	echo "<br>";
 	
 	// passing values to the parameters
 	$stmt->bindValue(':eid', $eid);
@@ -282,7 +267,8 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Schedule") {
 	$message = "Shift Added!";
 	echo "<script type='text/javascript'>alert('$message');</script>";
 }
-
+}
 ?>
 </div>
+
 </body>
