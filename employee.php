@@ -127,7 +127,7 @@ if(isset($_GET['del'])) {
 				$stmt->execute(); // execute the statement
 				$message = "Insert Successful!";
 				echo "<script type='text/javascript'>alert('$message');</script>";
-				header("Location: admin.php"); // re direct user
+				header("Location: admin.php?showemp=1"); // re direct user
 			} else {
 				$message = "Invalid! Firstname and lastname must not be empty.";
 				echo "<script type='text/javascript'>alert('$message');</script>";

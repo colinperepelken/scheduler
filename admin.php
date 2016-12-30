@@ -4,11 +4,32 @@
 </head>
 
 <?php
-// CONNECT TO DATABASE
+/* CONNECT TO DATABASE */
 require 'vendor/autoload.php';
 use App\SQLiteConnection;
 
 $pdo = (new SQLiteConnection())->connect();
+
+/* FUNCTIONS */
+
+/**
+ * Get all employees
+ */
+function getEmployees() {
+	global $pdo;
+	$sql = "SELECT id, firstname, lastname FROM Employee;";
+	$stmt = $pdo->query($sql);
+	$employees = [];
+	while ($employee = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+		$employees[] = [
+			'id' => $employee['id'],
+			'firstname' => $employee['firstname'],
+			'lastname' => $employee['lastname']
+		];
+	}
+	return $employees; // return list off employees
+}
+
 ?>
 
 <body>
@@ -145,18 +166,16 @@ if(isset($_GET['showemp'])) {
 	echo '<table><tbody>';
 	
 	// fetch list of employees
-	$sql = "SELECT id, firstname, lastname FROM Employee;";
-	$stmt = $pdo->query($sql);
-	while ($employee = $stmt->fetchObject()) {
-		$firstname = $employee->firstname;
-		$lastname = $employee->lastname;
-		$id = $employee->id;
+	foreach (getEmployees() as $employee) {
+		$firstname = $employee['firstname'];
+		$lastname = $employee['lastname'];
+		$id = $employee['id'];
 		echo "<tr><td><a href=\"employee.php?id=$id\">$firstname $lastname</a></td></tr>";
 	}
 	echo "<tr><td><a href=\"employee.php\">+ Add an Employee</a></td></tr></tbody></table>";
 	
 } else if(isset($_GET['day'])) {
-	/* SCHEDULING A SHIFT */
+	/* VIEWING SCHEDULED SHIFTS */
 	// get date info
 	$year = $_GET['year'];
 	$month = $_GET['month'];
@@ -164,32 +183,104 @@ if(isset($_GET['showemp'])) {
 	$date = "$year-$month-$day";
 	
 	echo "<h3>Shifts on $date</h3>"; // output header
-	echo "<table><tbody><tr><th>Start</th><th>End</th><th>Employee</th></tr>";
+	echo "<table id=\"shifts\"><tbody><tr><th>Start</th><th>Finish</th><th>Employee</th></tr>";
 	
 	// query shifts on this day
-	$sql = "SELECT start_date, finish_date, firstname, lastname"
+	$sql = "SELECT start_date, finish_date, firstname, lastname, id"
 			. " FROM Employee E, Shift S"
 			. " WHERE E.id = S.eid AND start_date LIKE :date;";
 	$stmt = $pdo->prepare($sql);
 	$date = "%".$date."%";
 	$stmt->execute([':date' => $date]);
+	$count = 0;
 	while ($shift = $stmt->fetchObject()) {
+		// start and finish displayed as only hours and minutes
 		$start = date("H:i:s", strtotime($shift->start_date));
 		$finish = date("H:i:s", strtotime($shift->finish_date));
 		$firstname = $shift->firstname;
 		$lastname = $shift->lastname;
+		$id = $shift->id;
 		
-		echo "<tr><td>$start</td><td>$finish</td><td>$firstname $lastname</td></tr>";
+		echo "<tr><td>$start</td><td>$finish</td><td><a href=\"employee.php?id=$id\">$firstname $lastname</a></td></tr>";
+		$count++;
 	}
-	
 	echo "</tbody></table>";
+	if($count == 0) {
+		echo "<p>No shifts scheduled.</p>";
+	}
 }
 ?>
 </div>
 <div id="panel2">
 <?php
+/* SCHEDULE A SHIFT */
 if(isset($_GET['day'])) {
-	echo "<h3>Schedule a Shift</h3>";
+	$date = str_replace("%","",$date); // remove % which were added for sql query.
+	echo "<h3>Schedule a Shift on $date</h3>"; // heading
+	// output form
+	echo "<form method=\"get\" action=\"admin.php\">
+			<table>
+			<tr><td align =\"left\">Employee:</td><td align =\"left\"><input list=\"employees\" name=\"employee\" value=\"\">
+			<datalist id=\"employees\">";
+	
+	// get list of employees for drop down input form
+	foreach(getEmployees() as $employee) {
+		$firstname = $employee['firstname'];
+		$lastname = $employee['lastname'];
+		$id = $employee['id'];
+		echo "<option value=\"$firstname $lastname ($id)\">";
+	}
+	
+	echo 	"</datalist>
+			</td></td>";
+		
+	
+	// output time inputs
+	echo "<tr><td  align =\"left\">Start:</td><td  align =\"left\"><input type=\"time\" name=\"start\" value=\"10:00 AM\"></td></td>
+			<tr><td align =\"left\">Finish:</td><td align =\"left\"><input type=\"time\" name=\"finish\" value=\"11:00 PM\"></td></td>
+			</table>
+			<input type=\"hidden\" name=\"day\" value=\"$day\">
+			<input type=\"hidden\" name=\"year\" value=\"$year\">
+			<input type=\"hidden\" name=\"month\" value=\"$month\">
+			<input type=\"submit\" name=\"submit\" value=\"Schedule\" id=\"submit\" />
+			</form>";
+	// end form
+}
+
+/* INSERT A SHIFT */
+if(isset($_GET['submit']) && $_GET['submit'] == "Schedule") {
+	// get
+	$employee = $_GET['employee'];
+	$start = $_GET['start'];
+	$finish = $_GET['finish'];
+		
+	// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
+	$eid = preg_replace("/[^0-9]/","",$employee); // get numbers from string and store in eid
+		
+	// format start_date and finish_date
+	$start_date = $date . " " . $start;
+	$finish_date = $date . " " . $finish;
+		
+	// prepare SQL insert statement
+	$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
+			. " VALUES (:eid, :start_date, :finish_date);";
+	$stmt = $pdo->prepare($sql);
+		
+	echo $eid;
+	echo "<br>";
+	echo $start_date;
+	echo "<br>";
+	echo $finish_date;
+	echo "<br>";
+	
+	// passing values to the parameters
+	$stmt->bindValue(':eid', $eid);
+	$stmt->bindValue(':start_date', $start_date);
+	$stmt->bindValue(':finish_date', $finish_date);
+				
+	$stmt->execute(); // execute the statement
+	$message = "Shift Added!";
+	echo "<script type='text/javascript'>alert('$message');</script>";
 }
 
 ?>
