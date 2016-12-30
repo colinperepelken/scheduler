@@ -93,9 +93,11 @@ for ($i = $count; $i < 7; $i++) {
 ?>
 </tr>
 </tbody>
-<table>
+</table>
 <input type="submit" name="submit" value="Save" id="submit" />
 </form>
 </div>
 </body>
-</html>
+<div id="footer">
+<p>Colin Bernard 2016</p>
+</div>

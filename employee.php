@@ -160,4 +160,7 @@ if(isset($_GET['del'])) {
 ?>
 </div>
 <body>
+<div id="footer">
+<p>Colin Bernard 2016</p>
+</div>
 </html>
