@@ -55,8 +55,9 @@ while ($day = $stmt->fetchObject()) {
 <td><a href = "settings.php"> Settings </a></td></tr></table>
 </div>
 </div>
-<div id="calendar">
+<div id="settings">
 <h3>Store Hours</h3>
+<p>Used for colouring the calendar and checking if a work day is fully staffed.</p>
 <form method="get" action="settings.php">
 <table>
 <tbody>
