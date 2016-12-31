@@ -102,8 +102,10 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 </div>
 <div id="panel">
 <?php
+if(isset($_GET['submit'])) {
 	echo "<h3>Hours worked from $start_date to $finish_date by $emp_name</h3>";
 	echo $hours;
+}
 ?>
 </div>
 </body>

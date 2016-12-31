@@ -232,7 +232,7 @@ if(isset($_GET['showemp'])) {
 			. " WHERE E.id = S.eid AND start_date LIKE :date"
 			. " ORDER BY start_date ASC;";
 	$stmt = $pdo->prepare($sql);
-	$date = "%".$date."%";
+	$date = "%".$date." %"; // space is important! otherwise shifts on day 28 will show for day 2
 	$stmt->execute([':date' => $date]);
 	$count = 0;
 	while ($shift = $stmt->fetchObject()) {
