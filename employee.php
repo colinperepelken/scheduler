@@ -154,11 +154,12 @@ if(isset($_GET['del'])) {
 	echo "<input type=\"hidden\" name=\"submitted\" value=\"1\">
 			<br><br>
 			<input type=\"submit\" name=\"submit\" value=\"Save\" id=\"submit\" />
-			</form>";
+			";
 			
 	if(!empty($id)) {
 		echo "<a href=employee.php?del=$id><button type=\"button\">Delete Employee</button></a>";
 	}
+	echo "</form>";
 }
 ?>
 </div>

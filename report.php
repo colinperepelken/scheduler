@@ -99,14 +99,15 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 </table>
 <input type="submit" name="submit" value="Generate Report" id="submit" />
 </form>
-</div>
-<div id="panel">
 <?php
 if(isset($_GET['submit'])) {
-	echo "<h3>Hours worked from $start_date to $finish_date by $emp_name</h3>";
-	echo $hours;
+	echo "<h5>Hours worked from $start_date to $finish_date by $emp_name:</h5>";
+	echo "$hours";
 }
 ?>
+</div>
+<div id="panel">
+
 </div>
 </body>
 <div id="footer">

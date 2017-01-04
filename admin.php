@@ -164,7 +164,7 @@ document.write(cal);
 if(isset($_GET['showemp'])) {
 	// output list of employees in table format
 	echo '<h3>Employee List</h3>';
-	echo '<p>(Click names to edit)</p>';
+	echo '<p align="left">(Click names to edit)</p>';
 	echo '<table><tbody>';
 	
 	// fetch list of employees
@@ -174,7 +174,7 @@ if(isset($_GET['showemp'])) {
 		$id = $employee['id'];
 		echo "<tr><td><a href=\"employee.php?id=$id\">$firstname $lastname</a></td></tr>";
 	}
-	echo "<tr><td><a href=\"employee.php\"><button type=\"button\">Add an Employee</button></a></td></tr></tbody></table>";
+	echo "<tr></tr><tr><td><br><a href=\"employee.php\"><button type=\"button\">Add an Employee</button></a></td></tr></tbody></table>";
 	
 } else if(isset($_GET['day'])) {
 
@@ -232,7 +232,7 @@ if(isset($_GET['showemp'])) {
 			. " WHERE E.id = S.eid AND start_date LIKE :date"
 			. " ORDER BY start_date ASC;";
 	$stmt = $pdo->prepare($sql);
-	$date = "%".$date." %"; // space is important! otherwise shifts on day 28 will show for day 2
+	$date = "%".$date." %"; // space i important! otherwise shifts on day 28 will show for day 2
 	$stmt->execute([':date' => $date]);
 	$count = 0;
 	while ($shift = $stmt->fetchObject()) {
