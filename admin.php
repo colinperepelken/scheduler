@@ -90,6 +90,7 @@ if(month == 0) {
 var DAYS_OF_WEEK = 7;    // "constant" for number of days in a week
 var DAYS_OF_MONTH = 31;    // "constant" for number of days in a month
 
+var actualMonth = Calendar.getMonth();
 Calendar.setDate(1);    // Start the calendar day at '1'
 Calendar.setMonth(month);    // Start the calendar month at now
 
@@ -127,7 +128,7 @@ for(index=0; index < DAYS_OF_WEEK; index++)
 {
 
 // BOLD TODAY'S DAY OF WEEK
-if(weekday == index) {
+if(weekday == index && actualMonth == month) {
 cal += TD_start + '<B>' + day_of_week[index] + '</B>' + TD_end;
 
 // PRINTS DAY
@@ -162,7 +163,7 @@ if( Calendar.getDate() > index )
   var day  = Calendar.getDate();
 
   if(day == <?php echo $day; ?>) {
-	  if( today==Calendar.getDate() ) {
+	  if( today==Calendar.getDate() && actualMonth == month) {
 		  cal += highlight_start + '<a href=admin.php?year=' + year + '&month=' + (month+1) + '&day=' + day + '>' + selected_start + day + selected_end + '</a>' + highlight_end + TD_end;
 	  } else {
 		   cal += TD_start + '<a href=admin.php?year=' + year + '&month=' + (month+1) + '&day=' + day + '>' + selected_start + day + selected_end + '</a>' + TD_end;
@@ -171,7 +172,7 @@ if( Calendar.getDate() > index )
 	 
 	  
   // HIGHLIGHT TODAY'S DATE
-  } else if( today==Calendar.getDate() ) {
+  } else if( today==Calendar.getDate() && actualMonth == month) {
   cal += highlight_start + '<a href=admin.php?year=' + year + '&month=' + (month+1) + '&day=' + day + '>' + day + '</a>' + highlight_end + TD_end;
 	
   // PRINTS DAY
