@@ -10,6 +10,8 @@ use App\SQLiteConnection;
 
 $pdo = (new SQLiteConnection())->connect();
 
+date_default_timezone_set('America/Los_Angeles'); // set default time zone to PST
+
 /* FUNCTIONS */
 
 /**
@@ -180,8 +182,8 @@ if(isset($_GET['showemp'])) {
 
 	// get date info
 	$year = $_GET['year'];
-	$month = $_GET['month'];
-	$day = $_GET['day'];
+	$month = sprintf("%02d", $_GET['month']);
+	$day = sprintf("%02d", $_GET['day']);
 	$date = "$year-$month-$day";
 
 	/* DELETE A SHIFT */
