@@ -5,6 +5,9 @@ use App\SQLiteConnection;
 
 $pdo = (new SQLiteConnection())->connect();
 
+date_default_timezone_set('America/Los_Angeles'); // set default time zone to PST
+
+
 // alert function
 function alert($message) {
 	echo "<script type='text/javascript'>alert('$message');</script>";
@@ -25,7 +28,7 @@ function alert($message) {
 <table id="top"><tr>
 <td><a href = "admin.php?year=<?php echo date("Y"); ?>&month=<?php echo date("m"); ?>&day=<?php echo date("d"); ?>"> Schedule a Shift </a></td>
 <td><a href = "report.php"> Generate Report </a></td>
-<td><a href = "admin.php?showemp=1"> Employees </a></td>
+<td><a href = "admin.php?showemp=1&year=<?php echo date("Y"); ?>&month=<?php echo date("m"); ?>&day=<?php echo date("d");?>"> Employees </a></td>
 <td><a href = "settings.php"> Settings </a></td></tr></table>
 </div>
 </div>
@@ -45,7 +48,7 @@ function validate() {
 }
 
 /* DELETING AN EMPLOYEE */
-if(isset($_GET['del'])) {
+if(isset($_GET['del'])) {	
 	$id = $_GET['del'];
 	$sql = "DELETE FROM Employee WHERE id = :id;";
 	$stmt = $pdo->prepare($sql);
@@ -137,7 +140,7 @@ if(isset($_GET['del'])) {
 				$stmt->execute(); // execute the statement
 				$message = "Insert Successful!";
 				echo "<script type='text/javascript'>alert('$message');</script>";
-				header("Location: admin.php?showemp=1"); // re direct user
+				header("Location: admin.php?showemp=1&year=".date("Y"). "&month=".date("m")."&day=".date("d")); // re direct user
 			} else {
 				$message = "Invalid! Firstname and lastname must not be empty.";
 				echo "<script type='text/javascript'>alert('$message');</script>";

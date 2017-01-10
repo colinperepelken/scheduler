@@ -48,7 +48,7 @@ function alert($message) {
 <table id="top"><tr>
 <td><a href = "admin.php?year=<?php echo date("Y"); ?>&month=<?php echo date("m"); ?>&day=<?php echo date("d"); ?>"> Schedule a Shift </a></td>
 <td><a href = "report.php"> Generate Report </a></td>
-<td><a href = "admin.php?showemp=1"> Employees </a></td>
+<td><a href = "admin.php?showemp=1&year=<?php echo date("Y"); ?>&month=<?php echo date("m"); ?>&day=<?php echo date("d"); ?>"> Employees </a></td>
 <td><a href = "settings.php"> Settings </a></td></tr></table>
 </div>
 </div>
@@ -128,13 +128,13 @@ for(index=0; index < DAYS_OF_WEEK; index++)
 {
 
 // BOLD TODAY'S DAY OF WEEK
-if(weekday == index && actualMonth == month) {
-cal += TD_start + '<B>' + day_of_week[index] + '</B>' + TD_end;
+//if(weekday == index && actualMonth == month) {
+//cal += TD_start + '<B>' + day_of_week[index] + '</B>' + TD_end;
 
 // PRINTS DAY
-}else{
+
 cal += TD_start + day_of_week[index] + TD_end;
-}
+
 }
 
 cal += TD_end + TR_end;
