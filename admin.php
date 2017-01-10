@@ -32,6 +32,10 @@ function getEmployees() {
 	return $employees; // return list off employees
 }
 
+function alert($message) {
+	echo "<script type='text/javascript'>alert('$message');</script>";
+}
+
 ?>
 
 <body>
@@ -201,25 +205,39 @@ if(isset($_GET['showemp'])) {
 		$employee = $_GET['employee'];
 		$start = $_GET['start'];
 		$finish = $_GET['finish'];
-			
-		// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
-		$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
-			
-		// format start_date and finish_date
-		$start_date = $date . " " . $start;
-		$finish_date = $date . " " . $finish;
-			
-		// prepare SQL insert statement
-		$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
-				. " VALUES (:eid, :start_date, :finish_date);";
-		$stmt = $pdo->prepare($sql);
 		
-		// passing values to the parameters
-		$stmt->bindValue(':eid', $eid);
-		$stmt->bindValue(':start_date', $start_date);
-		$stmt->bindValue(':finish_date', $finish_date);
+		// validate
+		if(new DateTime($start) < new DateTime($finish)) {
+			if(!empty($employee) && (preg_match('/\\d/', $employee) > 0)) {
+				
 					
-		$stmt->execute(); // execute the statement
+				// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
+				$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
+					
+				// format start_date and finish_date
+				$start_date = $date . " " . $start;
+				$finish_date = $date . " " . $finish;
+					
+				// prepare SQL insert statement
+				$sql = 	"INSERT INTO Shift(eid, start_date, finish_date)" 
+						. " VALUES (:eid, :start_date, :finish_date);";
+				$stmt = $pdo->prepare($sql);
+				
+				// passing values to the parameters
+				$stmt->bindValue(':eid', $eid);
+				$stmt->bindValue(':start_date', $start_date);
+				$stmt->bindValue(':finish_date', $finish_date);
+				
+				$stmt->execute(); // execute the statement
+				
+				
+			} else {
+				alert("Please select an employee.");
+			}
+		} else {
+			alert("Start time must be before finish time!");
+		}
+		
 	}
 	
 	

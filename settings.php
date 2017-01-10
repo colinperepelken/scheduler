@@ -5,6 +5,12 @@ use App\SQLiteConnection;
 
 $pdo = (new SQLiteConnection())->connect();
 
+// alert function
+function alert($message) {
+	echo "<script type='text/javascript'>alert('$message');</script>";
+}
+
+
 /* UPDATE HOURS */
 if (isset($_GET['submit']) && $_GET['submit'] == "Save") {
 	for($i = 0; $i < 7; $i++) {
@@ -25,7 +31,7 @@ if (isset($_GET['submit']) && $_GET['submit'] == "Save") {
 		$stmt->bindValue(':close_time', $close_times[$i]);
 		$stmt->execute();
 	}
-	
+	alert("Settings saved.");
 
 }
 

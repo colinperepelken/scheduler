@@ -4,6 +4,12 @@ require 'vendor/autoload.php';
 use App\SQLiteConnection;
 
 $pdo = (new SQLiteConnection())->connect();
+
+// alert function
+function alert($message) {
+	echo "<script type='text/javascript'>alert('$message');</script>";
+}
+
 ?>
 
 <head>
@@ -30,7 +36,9 @@ $pdo = (new SQLiteConnection())->connect();
 function validate() {
 	if(isset($_GET['firstname']) && isset($_GET['lastname'])) {
 		if(!empty($_GET['firstname']) && !empty($_GET['lastname'])) {
-			return true;
+			if((preg_match('/\\d/', $_GET['firstname']) <= 0) && (preg_match('/\\d/', $_GET['lastname']) <= 0)) {
+				return true;
+			} else { alert("Names must not contain numbers."); }
 		}
 	}
 	return false;
@@ -95,8 +103,7 @@ if(isset($_GET['del'])) {
 				$message = "Update Successful!";
 				echo "<script type='text/javascript'>alert('$message');</script>";
 			} else { // alert user
-				$message = "Invalid! Firstname and lastname must not be empty.";
-				echo "<script type='text/javascript'>alert('$message');</script>";
+				alert("Invalid! Firstname and lastname must not be empty.");
 			}
 		}
 		

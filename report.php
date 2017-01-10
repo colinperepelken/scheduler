@@ -5,6 +5,11 @@ use App\SQLiteConnection;
 
 $pdo = (new SQLiteConnection())->connect();
 
+
+function alert($message) {
+	echo "<script type='text/javascript'>alert('$message');</script>";
+}
+
 /**
  * Get all employees
  */
@@ -29,45 +34,56 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 	$finish_date = $_GET['finish'];
 	$employee = $_GET['employee'];
 	
-	// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
-	$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
-	// retrieve employee name (no id)
-	$emp_name = preg_replace('/[^\p{L}\p{N}\s]/u', '', $employee); // strip symbols
-	$emp_name = preg_replace('/[0-9]+/', '', $emp_name); // strip numbers
-	$emp_name = rtrim($emp_name, " "); // removes space from end of name
-	
-	// prepare SQL select statement
-	$sql = 	"SELECT start_date, finish_date"
-			. " FROM Shift S"
-			. " WHERE S.eid = :eid";
-	$stmt = $pdo->prepare($sql);
+	// validate
+	if(!empty($employee) && (preg_match('/\\d/', $employee) > 0)) {
 		
-	// passing values to the parameters
-	$stmt->bindValue(':eid', $eid);
+		// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
+		$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
+		// retrieve employee name (no id)
+		$emp_name = preg_replace('/[^\p{L}\p{N}\s]/u', '', $employee); // strip symbols
+		$emp_name = preg_replace('/[0-9]+/', '', $emp_name); // strip numbers
+		$emp_name = rtrim($emp_name, " "); // removes space from end of name
 		
-	$stmt->execute(); // execute the statement
-	
-	$hours = 0;
-	$shifts = [];
-	$shifts_hours = [];
-	
-	// calculate hours worked
-	while($row = $stmt->fetchObject()) {
-		$s = new DateTime($row->start_date);
-		$f = new DateTime($row->finish_date);
+		// prepare SQL select statement
+		$sql = 	"SELECT start_date, finish_date"
+				. " FROM Shift S"
+				. " WHERE S.eid = :eid";
+		$stmt = $pdo->prepare($sql);
+			
+		// passing values to the parameters
+		$stmt->bindValue(':eid', $eid);
+			
+		$stmt->execute(); // execute the statement
 		
-		if($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
-			$shifts[] = $row;
-			$difference = $f->diff($s);
-			$hours_to_add = floatval($difference->format('%H.%i'));
-			$intpart = floor($hours_to_add);
-			$fraction = $hours_to_add - $intpart;
-			$minutes = (($fraction * 10) / 60) * 10;
-			$shifts_hours[] = ($intpart + $minutes);
-			$hours += ($intpart + $minutes);
+		$hours = 0;
+		$shifts = [];
+		$shifts_hours = [];
+		
+		// calculate hours worked
+		while($row = $stmt->fetchObject()) {
+			$s = new DateTime($row->start_date);
+			$f = new DateTime($row->finish_date);
+			
+			// exclusive on start day, inclusive of finish day
+			if($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
+				$shifts[] = $row;
+				$difference = $f->diff($s);
+				$hours_to_add = floatval($difference->format('%H.%i'));
+				$intpart = floor($hours_to_add);
+				$fraction = $hours_to_add - $intpart;
+				$minutes = (($fraction * 10) / 60) * 10;
+				$shifts_hours[] = ($intpart + $minutes);
+				$hours += ($intpart + $minutes);
+
+			}
+			
 		}
 		
+	} else {
+		alert("Please select an employee.");
 	}
+	
+	
 }
 ?>
 
@@ -115,7 +131,7 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 <input type="submit" name="submit" value="Generate Report" id="submit" />
 </form>
 <?php
-if(isset($_GET['submit'])) {
+if(isset($_GET['submit']) && !empty($_GET['employee'])) {
 	echo "<h5>Hours worked from $start_date to $finish_date by $emp_name:</h5>";
 	echo "<table id=\"report\"><tbody><tr><th>Start</th><th>Finish</th><th>Hours</th></tr>";
 	
@@ -123,9 +139,9 @@ if(isset($_GET['submit'])) {
 	foreach($shifts as $shift) {
 		$start = $shift->start_date;
 		$finish = $shift->finish_date;
-		$hours = $shifts_hours[$count];
+		$s_hours = $shifts_hours[$count];
 		$count++;
-		echo "<tr><td>$start</td><td>$finish</td><td>$hours</td></tr>";
+		echo "<tr><td>$start</td><td>$finish</td><td>$s_hours</td></tr>";
 	}
 	echo "<tr></tr><tr><td></td><td></td><td id=\"total\"><b>Total: $hours</b></td></tr>";
 	echo "</tbody></table>";
