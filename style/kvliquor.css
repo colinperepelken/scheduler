@@ -85,6 +85,19 @@
 		text-align: center;
 	}
 	
+	table#report td{
+		width: 150px;
+		vertical-align: middle;
+		text-align: center;
+	}
+	
+	table#report td#total{
+		width: 150px;
+		vertical-align: middle;
+		text-align: left;
+		font-size: 22;
+	}
+	
 	#panel{
 		position: absolute;
 		top: 110px;

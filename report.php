@@ -34,6 +34,7 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 	// retrieve employee name (no id)
 	$emp_name = preg_replace('/[^\p{L}\p{N}\s]/u', '', $employee); // strip symbols
 	$emp_name = preg_replace('/[0-9]+/', '', $emp_name); // strip numbers
+	$emp_name = rtrim($emp_name, " "); // removes space from end of name
 	
 	// prepare SQL select statement
 	$sql = 	"SELECT start_date, finish_date"
@@ -47,6 +48,8 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 	$stmt->execute(); // execute the statement
 	
 	$hours = 0;
+	$shifts = [];
+	$shifts_hours = [];
 	
 	// calculate hours worked
 	while($row = $stmt->fetchObject()) {
@@ -54,11 +57,13 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 		$f = new DateTime($row->finish_date);
 		
 		if($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
+			$shifts[] = $row;
 			$difference = $f->diff($s);
 			$hours_to_add = floatval($difference->format('%H.%i'));
 			$intpart = floor($hours_to_add);
 			$fraction = $hours_to_add - $intpart;
 			$minutes = (($fraction * 10) / 60) * 10;
+			$shifts_hours[] = ($intpart + $minutes);
 			$hours += ($intpart + $minutes);
 		}
 		
@@ -112,7 +117,18 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 <?php
 if(isset($_GET['submit'])) {
 	echo "<h5>Hours worked from $start_date to $finish_date by $emp_name:</h5>";
-	echo "$hours";
+	echo "<table id=\"report\"><tbody><tr><th>Start</th><th>Finish</th><th>Hours</th></tr>";
+	
+	$count = 0;
+	foreach($shifts as $shift) {
+		$start = $shift->start_date;
+		$finish = $shift->finish_date;
+		$hours = $shifts_hours[$count];
+		$count++;
+		echo "<tr><td>$start</td><td>$finish</td><td>$hours</td></tr>";
+	}
+	echo "<tr></tr><tr><td></td><td></td><td id=\"total\"><b>Total: $hours</b></td></tr>";
+	echo "</tbody></table>";
 }
 ?>
 </div>
