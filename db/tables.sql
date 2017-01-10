@@ -20,8 +20,8 @@ CREATE TABLE Employee(
 CREATE TABLE Shift(
 	sid INTEGER,
 	eid INTEGER NOT NULL,
-	start_date DATETIME,
-	finish_date DATETIME,
+	start_date VARCHAR(16),
+	finish_date VARCHAR(16),
 	PRIMARY KEY(sid),
 	FOREIGN KEY (eid) REFERENCES Employee(id)
 		ON UPDATE CASCADE -- update shift employee if employee is updated

@@ -36,22 +36,32 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 	$emp_name = preg_replace('/[0-9]+/', '', $emp_name); // strip numbers
 	
 	// prepare SQL select statement
-	$sql = 	"SELECT SUM(strftime('%H %M %s',finish_date) - strftime('%H %M %s',start_date)) AS hours"
-			. " FROM Shift S, Employee E"
-			. " WHERE S.eid = E.id AND S.eid = :eid AND start_date >= :start_date AND start_date <= :finish_date";
+	$sql = 	"SELECT start_date, finish_date"
+			. " FROM Shift S"
+			. " WHERE S.eid = :eid";
 	$stmt = $pdo->prepare($sql);
 		
 	// passing values to the parameters
 	$stmt->bindValue(':eid', $eid);
-	$stmt->bindValue(':start_date', $start_date);
-	$stmt->bindValue(':finish_date', $finish_date);
 		
 	$stmt->execute(); // execute the statement
 	
 	$hours = 0;
-	// assuming only one row returned
+	
+	// calculate hours worked
 	while($row = $stmt->fetchObject()) {
-		$hours = $row->hours;
+		$s = new DateTime($row->start_date);
+		$f = new DateTime($row->finish_date);
+		
+		if($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
+			$difference = $f->diff($s);
+			$hours_to_add = floatval($difference->format('%H.%i'));
+			$intpart = floor($hours_to_add);
+			$fraction = $hours_to_add - $intpart;
+			$minutes = (($fraction * 10) / 60) * 10;
+			$hours += ($intpart + $minutes);
+		}
+		
 	}
 }
 ?>
@@ -75,7 +85,7 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 </div>
 <div id="settings">
 <h3>Generate Report</h3>
-<p>Determine hours worked over period.</p>
+<p>Determine hours worked over period. Does not include start day. Includes finish day.</p>
 <form method="get" action="report.php">
 <table>
 <tbody>
