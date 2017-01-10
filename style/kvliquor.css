@@ -35,6 +35,11 @@
 		font-size: 25;
 	}
 	
+	#selected{
+		font-size: 30;
+		
+	}
+	
 	#settings>p{
 		font-size: 14;
 	}
