@@ -13,6 +13,7 @@ CREATE TABLE Employee(
 	phone CHAR(10),
 	username VARCHAR(15),
 	password VARCHAR(15),
+	employed VARCHAR(5), -- true or false (SQLITE has no boolean data type)
 	PRIMARY KEY(id ASC)
 );
 

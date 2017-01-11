@@ -50,7 +50,8 @@ function validate() {
 /* DELETING AN EMPLOYEE */
 if(isset($_GET['del'])) {	
 	$id = $_GET['del'];
-	$sql = "DELETE FROM Employee WHERE id = :id;";
+	//$sql = "DELETE FROM Employee WHERE id = :id;";
+	$sql = "UPDATE Employee SET employed = 'false' WHERE id = :id"; // set employed attr to false
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute([':id' => $id]);
 	echo "<p>Employee Deleted</p>";
@@ -126,8 +127,8 @@ if(isset($_GET['del'])) {
 				$username = $_GET['username'];
 				$phone = $_GET['phone'];
 				
-				$sql = 	"INSERT INTO Employee(firstname, lastname, email, username, phone)" 
-						. "VALUES (:firstname, :lastname, :email, :username, :phone);";
+				$sql = 	"INSERT INTO Employee(firstname, lastname, email, username, phone, employed)" 
+						. "VALUES (:firstname, :lastname, :email, :username, :phone, 'true');";
 				$stmt = $pdo->prepare($sql);
 				
 				// passing values to the parameters

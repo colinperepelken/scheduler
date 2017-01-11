@@ -19,7 +19,7 @@ date_default_timezone_set('America/Los_Angeles'); // set default time zone to PS
  */
 function getEmployees() {
 	global $pdo;
-	$sql = "SELECT id, firstname, lastname FROM Employee ORDER BY firstname ASC";
+	$sql = "SELECT id, firstname, lastname FROM Employee WHERE employed = 'true' ORDER BY firstname ASC";
 	$stmt = $pdo->query($sql);
 	$employees = [];
 	while ($employee = $stmt->fetch(\PDO::FETCH_ASSOC)) {
