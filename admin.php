@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
 <title>KVLiquor - Admin</title>
 <link rel='stylesheet' type='text/css' href='style/kvliquor.css'/>
@@ -345,3 +347,4 @@ if(isset($_GET['showemp'])) {
 <div id="footer">
 <p>Colin Bernard 2016</p>
 </div>
+</html>

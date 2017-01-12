@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KVLiquor - Settings</title>
+<link rel='stylesheet' type='text/css' href='style/kvliquor.css'/>
 <?php
 // CONNECT TO DATABASE
 require 'vendor/autoload.php';
@@ -46,10 +51,6 @@ while ($day = $stmt->fetchObject()) {
 	$days[] = $day;
 }
 ?>
-
-<head>
-<title>KVLiquor - Settings</title>
-<link rel='stylesheet' type='text/css' href='style/kvliquor.css'/>
 </head>
 <body>
 <div id = "header">
@@ -110,3 +111,4 @@ for ($i = $count; $i < 7; $i++) {
 <div id="footer">
 <p>Colin Bernard 2016</p>
 </div>
+</html>

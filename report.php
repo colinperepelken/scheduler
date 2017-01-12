@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KVLiquor - Report</title>
+<link rel='stylesheet' type='text/css' href='style/kvliquor.css'/>
 <?php
 // CONNECT TO DATABASE
 require 'vendor/autoload.php';
@@ -88,10 +93,6 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 	
 }
 ?>
-
-<head>
-<title>KVLiquor - Report</title>
-<link rel='stylesheet' type='text/css' href='style/kvliquor.css'/>
 </head>
 <body>
 <div id = "header">
@@ -157,3 +158,4 @@ if(isset($_GET['submit']) && !empty($_GET['employee'])) {
 <div id="footer">
 <p>Colin Bernard 2016</p>
 </div>
+</html>

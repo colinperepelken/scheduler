@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KVLiquor - Employee</title>
+<link rel='stylesheet' type='text/css' href='style/kvliquor.css'/>
 <?php
 // CONNECT TO DATABASE
 require 'vendor/autoload.php';
@@ -14,10 +19,6 @@ function alert($message) {
 }
 
 ?>
-
-<head>
-<title>KVLiquor - Employee</title>
-<link rel='stylesheet' type='text/css' href='style/kvliquor.css'/>
 </head>
 <body>
 <div id = "header">
@@ -85,9 +86,6 @@ if(isset($_GET['del'])) {
 				$email = $_GET['email'];
 				$username = $_GET['username'];
 				$phone = $_GET['phone'];
-				
-				// TODO: ^^ strip symbols to prevent injections ^^
-				// TODO: validate phone format or change database design
 				
 				$sql = "UPDATE Employee 
 						SET firstname = :firstname, lastname = :lastname, 
