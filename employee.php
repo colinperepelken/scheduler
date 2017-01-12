@@ -22,7 +22,7 @@ function alert($message) {
 </head>
 <body>
 <div id = "header">
-<img src="http://i.imgur.com/rCYjjsD.jpg" style="float:left">
+<img src="images/logo.jpg" style="float:left">
 
 <div id="links">
 
