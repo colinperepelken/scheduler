@@ -67,7 +67,7 @@
 	</td><td><input type="date" name="finish" value="<?php if(isset($finish_date)){echo $finish_date;} ?>"></td></tr>
 </tbody>
 </table>
-<input type="submit" name="submit" value="Generate Email Text" id="submit" />
+<input type="submit" name="submit" value="Generate Emails" id="submit" />
 </form>
 <?php
 	if(isset($_GET['submit'])) {
