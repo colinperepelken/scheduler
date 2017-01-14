@@ -100,7 +100,7 @@
 			// print employee info
 			echo "<p>Schedule for <b>$firstname $lastname</b>:</p>";
 			echo "<p>Email: $email</p>";
-			echo "<textarea cols=\"100\" rows=\"15\">"; // open text area
+			echo "<textarea cols=\"100\" rows=\"15\" readonly>"; // open text area
 			$body = "Hello $firstname,&#13;&#10;&#13;&#10;";
 			$body .= "Here is your schedule from $start_date until $finish_date.&#13;&#10;&#13;&#10;";
 			
