@@ -100,7 +100,7 @@
 			// print employee info
 			echo "<p>Shifts for $firstname $lastname:</p>";
 			echo "<p>Email: $email</p>";
-			echo "<textarea cols=\"100\" rows=\"8\">"; // open text area
+			echo "<textarea cols=\"100\" rows=\"15\">"; // open text area
 			echo "Hello $firstname,&#13;&#10;&#13;&#10;";
 			echo "Here is your schedule from $start_date until $finish_date.&#13;&#10;&#13;&#10;";
 			
@@ -147,6 +147,6 @@
 </footer>
 </body>
 <div id="footer">
-<p>Colin Bernard 2016</p>
+<!-- intentionally removed as a simple fix -->
 </div>
 </html>
