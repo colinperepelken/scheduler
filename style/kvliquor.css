@@ -50,6 +50,8 @@
 		left: 20px;
 		font-family: "Trebuchet MS", Verdana, sans-serif;
 		font-size: 25;
+		padding:10px;
+   		padding-bottom:60px;   /* Height of the footer */
 	}
 	
 	a:link, a:visited, a:active {
@@ -146,4 +148,10 @@
 		left: 900px;
 		width: 300px;
 		height: 327px;
+	}
+
+	body {
+		margin:0;
+		padding:0;
+		height:100%;
 	}

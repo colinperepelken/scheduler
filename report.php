@@ -96,13 +96,14 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 </head>
 <body>
 <div id = "header">
-<img src="http://i.imgur.com/rCYjjsD.jpg" style="float:left">
+<img src="images/logo.jpg" style="float:left">
 
 <div id="links">
 
 <table id="top"><tr>
 <td><a href = "admin.php?year=<?php echo date("Y"); ?>&month=<?php echo date("m"); ?>&day=<?php echo date("d"); ?>"> Schedule a Shift </a></td>
 <td><a href = "report.php"> Generate Report </a></td>
+<td><a href = "email.php"> Generate Emails </a></td>
 <td><a href = "admin.php?showemp=1&year=<?php echo date("Y"); ?>&month=<?php echo date("m"); ?>&day=<?php echo date("d"); ?>"> Employees </a></td>
 <td><a href = "settings.php"> Settings </a></td></tr></table>
 </div>
