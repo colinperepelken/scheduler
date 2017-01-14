@@ -110,7 +110,7 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 </div>
 <div id="settings">
 <h3>Generate Report</h3>
-<p>Determine hours worked over period. Does not include start day. Includes finish day.</p>
+<p>Determine hours worked over period. Includes start day. Does NOT include finish day.</p>
 <form method="get" action="report.php">
 <table>
 <tbody>

@@ -58,7 +58,7 @@
 </div>
 <div id="settings">
 <h3>Email Schedule</h3>
-<p>Email schedules to employees. Range does not include start day. Includes finish day.</p>
+<p>Email schedules to employees. Includes start day. Does NOT include finish day.</p>
 <form method="get" action="email.php">
 <table>
 <tbody>
@@ -98,11 +98,11 @@
 			$shifts_hours = [];
 
 			// print employee info
-			echo "<p>Shifts for $firstname $lastname:</p>";
+			echo "<p>Schedule for <b>$firstname $lastname</b>:</p>";
 			echo "<p>Email: $email</p>";
 			echo "<textarea cols=\"100\" rows=\"15\">"; // open text area
-			echo "Hello $firstname,&#13;&#10;&#13;&#10;";
-			echo "Here is your schedule from $start_date until $finish_date.&#13;&#10;&#13;&#10;";
+			$body = "Hello $firstname,&#13;&#10;&#13;&#10;";
+			$body .= "Here is your schedule from $start_date until $finish_date.&#13;&#10;&#13;&#10;";
 			
 			// calculate hours worked
 			while($row = $stmt->fetchObject()) {
@@ -128,14 +128,23 @@
 			$count = 0;
 			foreach($shifts as $shift) {
 				$start = $shift->start_date;
+				$start = date('Y/m/d h:i a', strtotime($start));
 				$finish = $shift->finish_date;
+				$finish = date('Y/m/d h:i a', strtotime($finish));
 				$s_hours = $shifts_hours[$count];
 				$count++;
-				echo "&#09;Start: $start &#09; Finish: $finish &#09; Hours: $s_hours &#13;&#10;";
+				$body .= "&#09;Start: $start &#09; Finish: $finish &#09; Hours: $s_hours &#13;&#10;";
 			}
-			echo "&#09;Total Hours: $hours";
-			echo "&#13;&#10;&#13;&#10;Thanks,&#13;&#10;Management";
+			$body .= "&#09;Total Hours: $hours";
+			$body .= "&#13;&#10;&#13;&#10;Thanks,&#13;&#10;Management";
+			echo $body;
 			echo "</textarea>"; // close text area
+			// print "send email" button
+			echo "<br>";
+			// format body variable for mailto link
+			$body = str_replace("&#13;&#10;", "%0D%0A", $body); // replace new lines with mailto acceptable new line codes
+			$body = str_replace("&#09;", "          ", $body); // replace tabs to work for mailto
+			echo "<a href=\"mailto:$email?Subject=KVLiquor Schedule&Body=$body\"><button type=\"button\">Send Email</button></a>";
 			echo "<hr>"; // print horizontal line between employees
 		}
 	}
