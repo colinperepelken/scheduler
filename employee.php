@@ -153,7 +153,7 @@ if(isset($_GET['del'])) {
 			<tr><td align =\"left\">First Name:</td><td align =\"left\"><input type=\"text\" name=\"firstname\" size=\"30\" value=\"$firstname\"></td></td>
 			<tr><td  align =\"left\">Last Name:</td><td  align =\"left\"><input type=\"text\" name=\"lastname\" size=\"30\" value=\"$lastname\"></td></td>
 			<tr><td align =\"left\">Email:</td><td align =\"left\"><input type=\"text\" name=\"email\" size=\"30\" value=\"$email\"></td></td>
-			<tr><td align =\"left\">Site Username:</td><td align =\"left\"><input type=\"text\" name=\"username\" size=\"30\" value=\"$username\"></td></td>
+			<tr><td align =\"left\">Site Username:</td><td align =\"left\"><input type=\"text\" name=\"username\" size=\"30\" value=\"$username\"> (Not implemented)</td></td>
 			<tr><td align =\"left\">Phone:</td><td align =\"left\"><input type=\"text\" name=\"phone\" size=\"10\" value=\"$phone\"></td></td>
 			</table>";
 			
