@@ -85,7 +85,7 @@
 				$email = "Email not set!";
 			}
 
-			$sql = "SELECT start_date, finish_date FROM Shift WHERE eid = :eid;";
+			$sql = "SELECT start_date, finish_date FROM Shift WHERE eid = :eid ORDER BY start_date ASC;";
 			$stmt = $pdo->prepare($sql);
 
 			// pass value to the parameter
@@ -105,12 +105,12 @@
 			$body .= "Here is your schedule from $start_date until $finish_date.&#13;&#10;&#13;&#10;";
 			
 			// calculate hours worked
-			while($row = $stmt->fetchObject()) {
+			while ($row = $stmt->fetchObject()) {
 				$s = new DateTime($row->start_date);
 				$f = new DateTime($row->finish_date);
 				
 				// exclusive on start day, inclusive of finish day
-				if($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
+				if ($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
 					$shifts[] = $row;
 					$difference = $f->diff($s);
 					$hours_to_add = floatval($difference->format('%H.%i'));
@@ -124,9 +124,12 @@
 				
 			}
 
+			// sort shifts by start date
+			//asort($shifts);
+
 			// print employee shift information inside textarea tag
 			$count = 0;
-			foreach($shifts as $shift) {
+			foreach ($shifts as $shift) {
 				$start = $shift->start_date;
 				$start = date('Y/m/d h:i a', strtotime($start));
 				$finish = $shift->finish_date;

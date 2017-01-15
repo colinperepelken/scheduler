@@ -54,7 +54,8 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 		// prepare SQL select statement
 		$sql = 	"SELECT start_date, finish_date"
 				. " FROM Shift S"
-				. " WHERE S.eid = :eid";
+				. " WHERE S.eid = :eid"
+				. " ORDER BY start_date ASC";
 		$stmt = $pdo->prepare($sql);
 			
 		// passing values to the parameters
