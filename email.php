@@ -146,7 +146,7 @@
 			echo "<br>";
 			// format body variable for mailto link
 			$body = str_replace("&#13;&#10;", "%0D%0A", $body); // replace new lines with mailto acceptable new line codes
-			$body = str_replace("&#09;", "          ", $body); // replace tabs to work for mailto
+			$body = str_replace("&#09;", "______", $body); // replace tabs to work for mailto
 			echo "<a href=\"mailto:$email?Subject=KVLiquor Schedule&Body=$body\"><button type=\"button\">Send Email</button></a>";
 			echo "<hr>"; // print horizontal line between employees
 		}

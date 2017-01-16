@@ -22,7 +22,7 @@ function alert($message) {
  */
 function getEmployees() {
 	global $pdo;
-	$sql = "SELECT id, firstname, lastname FROM Employee ORDER BY firstname ASC";
+	$sql = "SELECT id, firstname, lastname FROM Employee WHERE employed = 'true' ORDER BY firstname ASC";
 	$stmt = $pdo->query($sql);
 	$employees = [];
 	while ($employee = $stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -33,65 +33,6 @@ function getEmployees() {
 		];
 	}
 	return $employees; // return list off employees
-}
-
-/* GENERATE REPORT BUTTON CLICKED */
-if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
-	$start_date = $_GET['start'];
-	$finish_date = $_GET['finish'];
-	$employee = $_GET['employee'];
-	
-	// validate
-	if(!empty($employee) && (preg_match('/\\d/', $employee) > 0)) {
-		
-		// retrieve employee id (could just use name but there could be conflicts if two employees have the same name)
-		$eid = preg_replace("/[^0-9]/", "", $employee); // get numbers from string and store in eid
-		// retrieve employee name (no id)
-		$emp_name = preg_replace('/[^\p{L}\p{N}\s]/u', '', $employee); // strip symbols
-		$emp_name = preg_replace('/[0-9]+/', '', $emp_name); // strip numbers
-		$emp_name = rtrim($emp_name, " "); // removes space from end of name
-		
-		// prepare SQL select statement
-		$sql = 	"SELECT start_date, finish_date"
-				. " FROM Shift S"
-				. " WHERE S.eid = :eid"
-				. " ORDER BY start_date ASC";
-		$stmt = $pdo->prepare($sql);
-			
-		// passing values to the parameters
-		$stmt->bindValue(':eid', $eid);
-			
-		$stmt->execute(); // execute the statement
-		
-		$hours = 0;
-		$shifts = [];
-		$shifts_hours = [];
-		
-		// calculate hours worked
-		while($row = $stmt->fetchObject()) {
-			$s = new DateTime($row->start_date);
-			$f = new DateTime($row->finish_date);
-			
-			// exclusive on start day, inclusive of finish day
-			if($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
-				$shifts[] = $row;
-				$difference = $f->diff($s);
-				$hours_to_add = floatval($difference->format('%H.%i'));
-				$intpart = floor($hours_to_add);
-				$fraction = $hours_to_add - $intpart;
-				$minutes = (($fraction * 10) / 60) * 10;
-				$shifts_hours[] = ($intpart + $minutes);
-				$hours += ($intpart + $minutes);
-
-			}
-			
-		}
-		
-	} else {
-		alert("Please select an employee.");
-	}
-	
-	
 }
 ?>
 </head>
@@ -112,52 +53,93 @@ if(isset($_GET['submit']) && $_GET['submit'] == "Generate Report") {
 <div id="settings">
 <h3>Generate Report</h3>
 <p>Determine hours worked over period. Includes start day. Does NOT include finish day.</p>
+<p>Once button is pressed... Click on box below then press CTRL+A to select all. Then copy into a document or email.</p>
 <form method="get" action="report.php">
 <table>
 <tbody>
-<tr><th>Start Date</th><th>Finish Date</th><th>Employee</th></tr>
+<tr><th>Start Date</th><th>Finish Date</th></tr>
 <tr><td><input type="date" name="start" value="<?php if(isset($start_date)){echo $start_date;} ?>">
-	</td><td><input type="date" name="finish" value="<?php if(isset($finish_date)){echo $finish_date;} ?>"></td>
-	<td><input list="employees" name="employee" value="<?php if(isset($employee)){echo $employee;} ?>">
-		<datalist id="employees">
-		<?php
-			// get list of employees for drop down input form
-			foreach(getEmployees() as $employee) {
-				$firstname = $employee['firstname'];
-				$lastname = $employee['lastname'];
-				$id = $employee['id'];
-				echo "<option value=\"$firstname $lastname ($id)\">";
-			}
-		?>
-		</datalist>
-	</td></tr>
+	</td><td><input type="date" name="finish" value="<?php if(isset($finish_date)){echo $finish_date;} ?>"></td></tr>
 </tbody>
 </table>
 <input type="submit" name="submit" value="Generate Report" id="submit" />
 </form>
+<textarea cols=150 rows = 150 readonly>
 <?php
-if(isset($_GET['submit']) && !empty($_GET['employee'])) {
-	echo "<h5>Hours worked from $start_date to $finish_date by $emp_name:</h5>";
-	echo "<table id=\"report\"><tbody><tr><th>Start</th><th>Finish</th><th>Hours</th></tr>";
-	
-	$count = 0;
-	foreach($shifts as $shift) {
-		$start = $shift->start_date;
-		$finish = $shift->finish_date;
-		$s_hours = $shifts_hours[$count];
-		$count++;
-		echo "<tr><td>$start</td><td>$finish</td><td>$s_hours</td></tr>";
+	if(isset($_GET['submit'])) {
+
+		$start_date = $_GET['start'];
+		$finish_date = $_GET['finish'];
+
+		foreach(getEmployees() as $employee) { // for each employee display the shifts they are working in the date range
+			$id = $employee['id'];
+			$firstname = $employee['firstname'];
+			$lastname = $employee['lastname'];
+
+
+			$sql = "SELECT start_date, finish_date FROM Shift WHERE eid = :eid ORDER BY start_date ASC;";
+			$stmt = $pdo->prepare($sql);
+
+			// pass value to the parameter
+			$stmt->bindValue(':eid', $id);
+
+			$stmt->execute(); // execute the statement
+
+			$hours = 0;
+			$shifts = [];
+			$shifts_hours = [];
+			
+			
+			// print employee info
+			$body = "$firstname $lastname:&#10;&#10;";
+			
+			$body .= "Shifts from $start_date until $finish_date.&#13;&#10;&#13;&#10;";
+			
+			// calculate hours worked
+			while ($row = $stmt->fetchObject()) {
+				$s = new DateTime($row->start_date);
+				$f = new DateTime($row->finish_date);
+				
+				// exclusive on start day, inclusive of finish day
+				if ($s > new DateTime($start_date) && $f <= new DateTime($finish_date)) {
+					$shifts[] = $row;
+					$difference = $f->diff($s);
+					$hours_to_add = floatval($difference->format('%H.%i'));
+					$intpart = floor($hours_to_add);
+					$fraction = $hours_to_add - $intpart;
+					$minutes = (($fraction * 10) / 60) * 10;
+					$shifts_hours[] = ($intpart + $minutes);
+					$hours += ($intpart + $minutes);
+					
+				}
+				
+			}
+
+			// print employee shift information inside textarea tag
+			$count = 0;
+			foreach ($shifts as $shift) {
+				$start = $shift->start_date;
+				$start = date('Y/m/d h:i a', strtotime($start));
+				$finish = $shift->finish_date;
+				$finish = date('Y/m/d h:i a', strtotime($finish));
+				$s_hours = $shifts_hours[$count];
+				$count++;
+				$body .= "&#09;Start: $start &#09; Finish: $finish &#09; Hours: $s_hours &#13;&#10;";
+			}
+			$body .= "&#09;Total Hours: $hours";
+			echo $body;
+			echo "&#10;&#10;--------------------------------------------------------------------------------------&#10;&#10;";
+		}
 	}
-	echo "<tr></tr><tr><td></td><td></td><td id=\"total\"><b>Total: $hours</b></td></tr>";
-	echo "</tbody></table>";
-}
+
 ?>
+</textarea>
 </div>
 <div id="panel">
 
 </div>
 </body>
 <div id="footer">
-<p>Colin Bernard 2016</p>
+<!-- intentionally left blank -->
 </div>
 </html>

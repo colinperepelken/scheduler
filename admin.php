@@ -320,7 +320,7 @@ if(isset($_GET['showemp'])) {
 			
 	
 	// output employee selector
-	echo "<td><input list=\"employees\" name=\"employee\" value=\"\"> 
+	echo "<td><input autocomplete=\"false\" list=\"employees\" name=\"employee\" value=\"\"> 
 			<datalist id=\"employees\">";
 	
 	// get list of employees for drop down input form
